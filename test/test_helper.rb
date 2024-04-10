@@ -8,6 +8,14 @@ require 'minitest'
 require "minitest/autorun"
 require 'enum_state_machine'
 
+# The upstream repo capitalizes the "T" in "MiniTest".
+# This results in a the following error when running the tests:
+#
+#   uninitialized constant MiniTest (NameError)
+#
+# Rather than renaming throughout, we add an alias to Minitest
+MiniTest = Minitest
+
 class MiniTest::Test
   def assert_nothing_raised
     yield

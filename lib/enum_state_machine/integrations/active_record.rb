@@ -455,10 +455,17 @@ module EnumStateMachine
           # attributes passed into #initialize
           define_helper :class, <<-end_eval, __FILE__, __LINE__ + 1
             def column_defaults(*) #:nodoc:
-              result = super
+              @column_defaults = super
+              return @column_defaults if @column_defaults_are_set
+              @column_defaults_are_set = true
+
+              was_frozen = @column_defaults.frozen?
+              @column_defaults = @column_defaults.deep_dup if was_frozen
+
               # No need to pass in an object, since the overrides will be forced
-              self.state_machines.initialize_states(nil, :static => :force, :dynamic => false, :to => result)
-              result
+              self.state_machines.initialize_states(nil, :static => :force, :dynamic => false, :to => @column_defaults)
+
+              @column_defaults.tap { |defaults| defaults.freeze if was_frozen }
             end
           end_eval
         end
@@ -479,11 +486,11 @@ module EnumStateMachine
         def define_action_hook
           if action_hook == :save
             define_helper :instance, <<-end_eval, __FILE__, __LINE__ + 1
-              def save(*)
+              def save(**)
                 self.class.state_machine(#{name.inspect}).send(:around_save, self) { super }
               end
               
-              def save!(*)
+              def save!(**)
                 self.class.state_machine(#{name.inspect}).send(:around_save, self) { super } || raise(ActiveRecord::RecordInvalid.new(self))
               end
               
