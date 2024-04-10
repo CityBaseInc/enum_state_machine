@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
   #s.add_dependency "rails-observers", ">= 0.1.2"
   s.add_dependency "power_enum", "> 2.8", "< 4.0"
 
-  s.add_development_dependency(%q<gemfury>)
   s.add_development_dependency "rake"
   s.add_development_dependency "minitest", "~> 5.1"
   s.add_development_dependency "simplecov"
